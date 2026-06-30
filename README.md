@@ -1,6 +1,6 @@
 # xcx-g2s-meter
 
-[AkaDako](https://akadako.com/) ボード（S-LINK）を使って **電圧・電流・電力** を計測するための [Xcratch](https://xcratch.github.io/) 拡張機能です。
+[AkaDako](https://akadako.com/) ボード（S-LINK）と [AkaDako用電力測定ボード（TFW-AD-PWR1）](https://tfabworks.com/product/tfw-ad-pwr1/) を使って **電圧・電流・電力** を計測するための [Xcratch](https://xcratch.github.io/) 拡張機能です。
 
 [tfabworks/xcx-g2s](https://github.com/tfabworks/xcx-g2s) をベースに、電流・電圧・電力メーター（参考: <https://699.jp/wattmeter/>）の計測ブロックを追加しています。AkaDako の既存ブロック（Grove センサー／アクチュエーター、アナログ・デジタル入出力など）もそのまま利用できます。
 
@@ -23,10 +23,15 @@
 - 電力 = 電圧 × 電流
 - レベルが 0.1 以下のときはノイズ・未接続とみなして 0 とします。
 
-## 🔌 配線
+## 🔌 配線（AkaDako用電力測定ボード TFW-AD-PWR1）
 
-- 電圧センサーの出力を **アナログ A1** に接続します。
-- 電流センサーの出力を **アナログ A2** に接続します。
+計測には [AkaDako用電力測定ボード（TFW-AD-PWR1）](https://tfabworks.com/product/tfw-ad-pwr1/) を使います。
+
+1. TFW-AD-PWR1 を付属の Grove ケーブルで、AkaDako の **アナログ（Analog A）Grove 端子** に接続します。
+2. 測定したい回路を、ボードの端子につなぎます。
+   - **入力 ＋/−**: 手回し発電機・電池などの電源
+   - **出力 ＋/−**: 豆電球・LED・扇風機などの負荷
+3. ボード内部で電圧が **アナログ A1**、電流が **アナログ A2** に出力され、本拡張の電圧・電流・電力ブロックがその値を読み取ります（追加の配線は不要です）。
 
 ## 🚀 Xcratch での使い方
 
