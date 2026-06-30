@@ -1623,9 +1623,9 @@ var en = {
 	"g2s.analogLevelA2": "value of AnalogA(A2)",
 	"g2s.analogLevelB1": "value of AnalogB(B1)",
 	"g2s.analogLevelB2": "value of AnalogB(B2)",
-	"g2s.measureVoltage": "voltage [V]",
-	"g2s.measureCurrent": "current [A]",
-	"g2s.measurePower": "power [W]",
+	"g2s.measureVoltage": "voltage (V)",
+	"g2s.measureCurrent": "current (A)",
+	"g2s.measurePower": "power (W)",
 	"g2s.digitalLevelA1": "value of DigitalA(A1)",
 	"g2s.digitalLevelA2": "value of DigitalA(A2)",
 	"g2s.digitalLevelB1": "value of DigitalB(B1)",
@@ -1739,9 +1739,9 @@ var ja = {
 	"g2s.analogLevelA2": "アナログA(A2)の値",
 	"g2s.analogLevelB1": "アナログB(B1)の値",
 	"g2s.analogLevelB2": "アナログB(B2)の値",
-	"g2s.measureVoltage": "電圧 [V]",
-	"g2s.measureCurrent": "電流 [A]",
-	"g2s.measurePower": "電力 [W]",
+	"g2s.measureVoltage": "電圧の値(V)",
+	"g2s.measureCurrent": "電流の値(A)",
+	"g2s.measurePower": "電力の値(W)",
 	"g2s.digitalLevelA1": "デジタルA(A1)の値",
 	"g2s.digitalLevelA2": "デジタルA(A2)の値",
 	"g2s.digitalLevelB1": "デジタルB(B1)の値",
@@ -1858,9 +1858,9 @@ var translations = {
 	"g2s.analogLevelA2": "アナログA(A2)のあたい",
 	"g2s.analogLevelB1": "アナログB(B1)のあたい",
 	"g2s.analogLevelB2": "アナログB(B2)のあたい",
-	"g2s.measureVoltage": "でんあつ [V]",
-	"g2s.measureCurrent": "でんりゅう [A]",
-	"g2s.measurePower": "でんりょく [W]",
+	"g2s.measureVoltage": "でんあつのあたい(V)",
+	"g2s.measureCurrent": "でんりゅうのあたい(A)",
+	"g2s.measurePower": "でんりょくのあたい(W)",
 	"g2s.digitalLevelA1": "デジタルA(A1)のあたい",
 	"g2s.digitalLevelA2": "デジタルA(A2)のあたい",
 	"g2s.digitalLevelB1": "デジタルB(B1)のあたい",
@@ -29840,7 +29840,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
           disableMonitor: false,
           text: formatMessage({
             id: 'g2s.measureVoltage',
-            default: 'voltage [V]',
+            default: 'voltage (V)',
             description: 'report measured voltage on analog A1 in volts'
           }),
           arguments: {}
@@ -29850,7 +29850,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
           disableMonitor: false,
           text: formatMessage({
             id: 'g2s.measureCurrent',
-            default: 'current [A]',
+            default: 'current (A)',
             description: 'report measured current on analog A2 in amperes'
           }),
           arguments: {}
@@ -29860,7 +29860,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
           disableMonitor: false,
           text: formatMessage({
             id: 'g2s.measurePower',
-            default: 'power [W]',
+            default: 'power (W)',
             description: 'report measured electric power in watts'
           }),
           arguments: {}

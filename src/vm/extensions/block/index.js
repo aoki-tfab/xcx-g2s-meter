@@ -3208,7 +3208,7 @@ class ExtensionBlocks {
                     disableMonitor: false,
                     text: formatMessage({
                         id: 'g2s.measureVoltage',
-                        default: 'voltage [V]',
+                        default: 'voltage (V)',
                         description: 'report measured voltage on analog A1 in volts'
                     }),
                     arguments: {
@@ -3220,7 +3220,7 @@ class ExtensionBlocks {
                     disableMonitor: false,
                     text: formatMessage({
                         id: 'g2s.measureCurrent',
-                        default: 'current [A]',
+                        default: 'current (A)',
                         description: 'report measured current on analog A2 in amperes'
                     }),
                     arguments: {
@@ -3232,7 +3232,7 @@ class ExtensionBlocks {
                     disableMonitor: false,
                     text: formatMessage({
                         id: 'g2s.measurePower',
-                        default: 'power [W]',
+                        default: 'power (W)',
                         description: 'report measured electric power in watts'
                     }),
                     arguments: {
