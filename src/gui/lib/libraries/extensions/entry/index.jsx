@@ -24,7 +24,7 @@ const entry = {
         })} (v${version})`;
     },
     extensionId: 'g2s',
-    extensionURL: 'https://xcx-g2s.surge.sh/g2s.mjs',
+    extensionURL: 'https://aoki-tfab.github.io/xcx-g2s-meter/dist/g2s.mjs',
     collaborator: 'TFabWorks',
     iconURL: iconURL,
     insetIconURL: insetIconURL,

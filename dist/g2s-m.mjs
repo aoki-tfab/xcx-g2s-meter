@@ -46,7 +46,7 @@ var entry = {
   },
 
   extensionId: 'g2s',
-  extensionURL: 'https://xcx-g2s.surge.sh/g2s.mjs',
+  extensionURL: 'https://aoki-tfab.github.io/xcx-g2s-meter/dist/g2s.mjs',
   collaborator: 'TFabWorks',
   iconURL: img$2,
   insetIconURL: img$1,
@@ -1623,6 +1623,9 @@ var en = {
 	"g2s.analogLevelA2": "value of AnalogA(A2)",
 	"g2s.analogLevelB1": "value of AnalogB(B1)",
 	"g2s.analogLevelB2": "value of AnalogB(B2)",
+	"g2s.measureVoltage": "voltage [V]",
+	"g2s.measureCurrent": "current [A]",
+	"g2s.measurePower": "power [W]",
 	"g2s.digitalLevelA1": "value of DigitalA(A1)",
 	"g2s.digitalLevelA2": "value of DigitalA(A2)",
 	"g2s.digitalLevelB1": "value of DigitalB(B1)",
@@ -1736,6 +1739,9 @@ var ja = {
 	"g2s.analogLevelA2": "アナログA(A2)の値",
 	"g2s.analogLevelB1": "アナログB(B1)の値",
 	"g2s.analogLevelB2": "アナログB(B2)の値",
+	"g2s.measureVoltage": "電圧 [V]",
+	"g2s.measureCurrent": "電流 [A]",
+	"g2s.measurePower": "電力 [W]",
 	"g2s.digitalLevelA1": "デジタルA(A1)の値",
 	"g2s.digitalLevelA2": "デジタルA(A2)の値",
 	"g2s.digitalLevelB1": "デジタルB(B1)の値",
@@ -1852,6 +1858,9 @@ var translations = {
 	"g2s.analogLevelA2": "アナログA(A2)のあたい",
 	"g2s.analogLevelB1": "アナログB(B1)のあたい",
 	"g2s.analogLevelB2": "アナログB(B2)のあたい",
+	"g2s.measureVoltage": "でんあつ [V]",
+	"g2s.measureCurrent": "でんりゅう [A]",
+	"g2s.measurePower": "でんりょく [W]",
 	"g2s.digitalLevelA1": "デジタルA(A1)のあたい",
 	"g2s.digitalLevelA2": "デジタルA(A2)のあたい",
 	"g2s.digitalLevelB1": "デジタルB(B1)のあたい",
@@ -7302,7 +7311,7 @@ var Firmata$1 = /*#__PURE__*/function (_EventEmitter) {
                   Set `stopTX` to `false` if this peripheral
                   expects Wire to keep the transmission connection alive between
                   setting a register and requesting bytes.
-                   Defaults to `true`.
+                    Defaults to `true`.
              */
           }
         }
@@ -25732,7 +25741,7 @@ var EXTENSION_ID = 'g2s';
  * @type {string}
  */
 
-var extensionURL = 'https://xcx-g2s.surge.sh/g2s.mjs';
+var extensionURL = 'https://aoki-tfab.github.io/xcx-g2s-meter/dist/g2s.mjs';
 /**
  * States the video sensing activity can be set to.
  * @readonly
@@ -25749,6 +25758,19 @@ var VideoState = {
   /** Video turned on without default y axis mirroring. */
   ON_FLIPPED: 'on-flipped'
 };
+/**
+ * 電流・電圧・電力メーターの換算定数。
+ * 参照: ./akadako-meter-slim.html および https://699.jp/wattmeter/
+ * アナログレベル(0〜100 [%])にこれらの係数を掛けて実量を得る。
+ * @readonly
+ */
+// アナログレベルがこの値以下のときは 0 とみなす（ノイズ・未接続対策）
+
+var METER_MIN_LEVEL = 0.1; // 電圧: アナログA1レベル(0〜100) × 0.2 → 0〜20V
+
+var METER_VOLTAGE_COEFF = 0.2; // 電流: アナログA2レベル(0〜100) × 0.02 → 0〜2A
+
+var METER_CURRENT_COEFF = 0.02;
 /**
  * Scratch 3.0 blocks for example of Xcratch.
  */
@@ -26557,6 +26579,47 @@ var ExtensionBlocks = /*#__PURE__*/function () {
       if (!this.isConnected()) return '';
       var raw = this.board.getAnalogValue(3);
       return Math.round(raw / 1023 * 1000) / 10;
+    }
+    /**
+     * Measured voltage [V] on the analog A1 connector. Range 0 to 20 [V].
+     * Converts the analog level (0-100 [%]) with METER_VOLTAGE_COEFF.
+     * @returns {number | string} - voltage [V] or empty string when disconnected
+     */
+
+  }, {
+    key: "measureVoltage",
+    value: function measureVoltage() {
+      var level = this.analogLevelA1();
+      if (typeof level !== 'number') return '';
+      var voltage = level > METER_MIN_LEVEL ? level * METER_VOLTAGE_COEFF : 0;
+      return Math.round(voltage * 100) / 100;
+    }
+    /**
+     * Measured current [A] on the analog A2 connector. Range 0 to 2 [A].
+     * Converts the analog level (0-100 [%]) with METER_CURRENT_COEFF.
+     * @returns {number | string} - current [A] or empty string when disconnected
+     */
+
+  }, {
+    key: "measureCurrent",
+    value: function measureCurrent() {
+      var level = this.analogLevelA2();
+      if (typeof level !== 'number') return '';
+      var current = level > METER_MIN_LEVEL ? level * METER_CURRENT_COEFF : 0;
+      return Math.round(current * 100) / 100;
+    }
+    /**
+     * Measured electric power [W] = voltage [V] x current [A]. Range 0 to 40 [W].
+     * @returns {number | string} - power [W] or empty string when disconnected
+     */
+
+  }, {
+    key: "measurePower",
+    value: function measurePower() {
+      var voltage = this.measureVoltage();
+      var current = this.measureCurrent();
+      if (typeof voltage !== 'number' || typeof current !== 'number') return '';
+      return Math.round(voltage * current * 100) / 100;
     }
     /**
      * Set the connector to power [%] as PWM.
@@ -29769,6 +29832,36 @@ var ExtensionBlocks = /*#__PURE__*/function () {
             id: 'g2s.analogLevelB2',
             default: 'value of AnalogB(B2)',
             description: 'report analog level of the connector'
+          }),
+          arguments: {}
+        }, '---', {
+          opcode: 'measureVoltage',
+          blockType: blockType.REPORTER,
+          disableMonitor: false,
+          text: formatMessage({
+            id: 'g2s.measureVoltage',
+            default: 'voltage [V]',
+            description: 'report measured voltage on analog A1 in volts'
+          }),
+          arguments: {}
+        }, {
+          opcode: 'measureCurrent',
+          blockType: blockType.REPORTER,
+          disableMonitor: false,
+          text: formatMessage({
+            id: 'g2s.measureCurrent',
+            default: 'current [A]',
+            description: 'report measured current on analog A2 in amperes'
+          }),
+          arguments: {}
+        }, {
+          opcode: 'measurePower',
+          blockType: blockType.REPORTER,
+          disableMonitor: false,
+          text: formatMessage({
+            id: 'g2s.measurePower',
+            default: 'power [W]',
+            description: 'report measured electric power in watts'
           }),
           arguments: {}
         }, '---', {

@@ -1,49 +1,79 @@
-# Grove2Scratch
-An example extension for [Xcratch](https://xcratch.github.io/)
+# xcx-g2s-meter
 
-This extension add extra-block "do it", that executes string in its input field as a sentence in Javascript and return the result.
+[AkaDako](https://akadako.com/) ボード（S-LINK）を使って **電圧・電流・電力** を計測するための [Xcratch](https://xcratch.github.io/) 拡張機能です。
 
+[tfabworks/xcx-g2s](https://github.com/tfabworks/xcx-g2s) をベースに、電流・電圧・電力メーター（参考: <https://699.jp/wattmeter/>）の計測ブロックを追加しています。AkaDako の既存ブロック（Grove センサー／アクチュエーター、アナログ・デジタル入出力など）もそのまま利用できます。
 
-## ✨ What You Can Do With This Extension
+## ✨ 追加した計測ブロック
 
-Play [Example Project](https://xcratch.github.io/editor/#https://tfabworks.github.io/xcx-g2s/projects/example.sb3) to look at what you can do with "Grove" extension. 
-<iframe src="https://xcratch.github.io/editor/player#https://tfabworks.github.io/xcx-g2s/projects/example.sb3" width="540px" height="460px"></iframe>
+| ブロック | 説明 | 入力コネクタ | 範囲 |
+| --- | --- | --- | --- |
+| `電圧 [V]` | 計測した電圧を返す | アナログ **A1** | 0 〜 20 V |
+| `電流 [A]` | 計測した電流を返す | アナログ **A2** | 0 〜 2 A |
+| `電力 [W]` | 電圧 × 電流 を返す | A1・A2 から算出 | 0 〜 40 W |
 
+いずれも値を返すレポーターブロックです。ボード未接続のときは空文字を返します。
 
-## How to Use in Xcratch
+### 計測のしくみ
 
-This extension can be used with other extension in [Xcratch](https://xcratch.github.io/). 
-1. Open [Xcratch Editor](https://xcratch.github.io/editor)
-2. Click 'Add Extension' button
-3. Select 'Extension Loader' extension
-4. Type the module URL in the input field 
+参考サイト <https://699.jp/wattmeter/> と同じ換算を行っています。AkaDako のアナログ入力レベル（0〜100）に係数を掛けて実量に変換します。
+
+- 電圧 = アナログ A1 のレベル × 0.2 （0〜100 → 0〜20 V）
+- 電流 = アナログ A2 のレベル × 0.02 （0〜100 → 0〜2 A）
+- 電力 = 電圧 × 電流
+- レベルが 0.1 以下のときはノイズ・未接続とみなして 0 とします。
+
+## 🔌 配線
+
+- 電圧センサーの出力を **アナログ A1** に接続します。
+- 電流センサーの出力を **アナログ A2** に接続します。
+
+## 🚀 Xcratch での使い方
+
+この拡張は [Xcratch](https://xcratch.github.io/) 上で他の拡張と一緒に使えます。
+
+1. [Xcratch エディター](https://xcratch.github.io/editor) を開く
+2. 「拡張機能を追加」ボタンをクリック
+3. 「Extension Loader」拡張を選ぶ
+4. 入力欄に次のモジュール URL を入力する
+
 ```
-https://tfabworks.github.io/xcx-g2s/dist/g2s.mjs
+https://aoki-tfab.github.io/xcx-g2s-meter/dist/g2s.mjs
 ```
 
-## Development
+5. 「ボードを接続する」ブロックで AkaDako（S-LINK）に接続してから、電圧・電流・電力ブロックを使います。
 
-### Register on the local Xcratch
+> 接続には Web MIDI / Web Serial を使うため、Google Chrome などの対応ブラウザーで開いてください。
 
-Run register script to install this extension on the local Xcratch for testing.
+## 🛠 開発
+
+### 必要環境
+
+- Node.js（LTS 推奨）
+
+### セットアップとビルド
 
 ```sh
-npm run register
-```
-
-### Bundle into a Module
-
-Run build script to bundle this extension into a module file which could be loaded on Xcratch.
-
-```sh
+npm install
 npm run build
 ```
 
-## 🏠 Home Page
+`npm run build` はベースの [scratch-gui](https://github.com/xcratch/scratch-gui) を `../scratch-gui` に取得してから、拡張モジュールを `dist/g2s.mjs` にバンドルします。
 
-Open this page from [https://tfabworks.github.io/xcx-g2s/](https://tfabworks.github.io/xcx-g2s/)
+> ローカルの Xcratch にインストールして開発する `npm run register` は、scratch-vm 配下へのシンボリックリンク作成を伴うため、Windows では管理者権限／開発者モードが必要です。`dist/g2s.mjs` のビルドだけなら `node scripts/build.js` を直接実行しても作成できます。
 
+## 📦 公開（GitHub Pages）
 
-## 🤝 Contributing
+`dist/g2s.mjs` を GitHub Pages で配信し、上記のモジュール URL から読み込みます。
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/tfabworks/xcx-g2s/issues). 
+ホームページ: <https://aoki-tfab.github.io/xcx-g2s-meter/>
+
+## 🙏 クレジット
+
+- ベース拡張: [tfabworks/xcx-g2s](https://github.com/tfabworks/xcx-g2s)（MIT License）
+- 計測ロジックの参考: [AkaDako 電流・電圧・電力メーター](https://699.jp/wattmeter/) / [AkaDako](https://akadako.com/)
+- 拡張プラットフォーム: [Xcratch](https://xcratch.github.io/)
+
+## 📝 ライセンス
+
+ベースリポジトリにならい [MIT License](./LICENSE) で公開しています。

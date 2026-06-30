@@ -107,7 +107,7 @@ const EXTENSION_ID = 'g2s';
  * When it was loaded as a module, 'extensionURL' will be replaced a URL which is retrieved from.
  * @type {string}
  */
-let extensionURL = 'https://xcx-g2s.surge.sh/g2s.mjs';
+let extensionURL = 'https://aoki-tfab.github.io/xcx-g2s-meter/dist/g2s.mjs';
 
 /**
  * States the video sensing activity can be set to.
@@ -124,6 +124,19 @@ const VideoState = {
     /** Video turned on without default y axis mirroring. */
     ON_FLIPPED: 'on-flipped'
 };
+
+/**
+ * 電流・電圧・電力メーターの換算定数。
+ * 参照: ./akadako-meter-slim.html および https://699.jp/wattmeter/
+ * アナログレベル(0〜100 [%])にこれらの係数を掛けて実量を得る。
+ * @readonly
+ */
+// アナログレベルがこの値以下のときは 0 とみなす（ノイズ・未接続対策）
+const METER_MIN_LEVEL = 0.1;
+// 電圧: アナログA1レベル(0〜100) × 0.2 → 0〜20V
+const METER_VOLTAGE_COEFF = 0.2;
+// 電流: アナログA2レベル(0〜100) × 0.02 → 0〜2A
+const METER_CURRENT_COEFF = 0.02;
 
 /**
  * Scratch 3.0 blocks for example of Xcratch.
@@ -839,6 +852,41 @@ class ExtensionBlocks {
         if (!this.isConnected()) return '';
         const raw = this.board.getAnalogValue(3);
         return Math.round((raw / 1023) * 1000) / 10;
+    }
+
+    /**
+     * Measured voltage [V] on the analog A1 connector. Range 0 to 20 [V].
+     * Converts the analog level (0-100 [%]) with METER_VOLTAGE_COEFF.
+     * @returns {number | string} - voltage [V] or empty string when disconnected
+     */
+    measureVoltage () {
+        const level = this.analogLevelA1();
+        if (typeof level !== 'number') return '';
+        const voltage = level > METER_MIN_LEVEL ? level * METER_VOLTAGE_COEFF : 0;
+        return Math.round(voltage * 100) / 100;
+    }
+
+    /**
+     * Measured current [A] on the analog A2 connector. Range 0 to 2 [A].
+     * Converts the analog level (0-100 [%]) with METER_CURRENT_COEFF.
+     * @returns {number | string} - current [A] or empty string when disconnected
+     */
+    measureCurrent () {
+        const level = this.analogLevelA2();
+        if (typeof level !== 'number') return '';
+        const current = level > METER_MIN_LEVEL ? level * METER_CURRENT_COEFF : 0;
+        return Math.round(current * 100) / 100;
+    }
+
+    /**
+     * Measured electric power [W] = voltage [V] x current [A]. Range 0 to 40 [W].
+     * @returns {number | string} - power [W] or empty string when disconnected
+     */
+    measurePower () {
+        const voltage = this.measureVoltage();
+        const current = this.measureCurrent();
+        if (typeof voltage !== 'number' || typeof current !== 'number') return '';
+        return Math.round(voltage * current * 100) / 100;
     }
 
     /**
@@ -3149,6 +3197,43 @@ class ExtensionBlocks {
                         id: 'g2s.analogLevelB2',
                         default: 'value of AnalogB(B2)',
                         description: 'report analog level of the connector'
+                    }),
+                    arguments: {
+                    }
+                },
+                '---',
+                {
+                    opcode: 'measureVoltage',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: false,
+                    text: formatMessage({
+                        id: 'g2s.measureVoltage',
+                        default: 'voltage [V]',
+                        description: 'report measured voltage on analog A1 in volts'
+                    }),
+                    arguments: {
+                    }
+                },
+                {
+                    opcode: 'measureCurrent',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: false,
+                    text: formatMessage({
+                        id: 'g2s.measureCurrent',
+                        default: 'current [A]',
+                        description: 'report measured current on analog A2 in amperes'
+                    }),
+                    arguments: {
+                    }
+                },
+                {
+                    opcode: 'measurePower',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: false,
+                    text: formatMessage({
+                        id: 'g2s.measurePower',
+                        default: 'power [W]',
+                        description: 'report measured electric power in watts'
                     }),
                     arguments: {
                     }
