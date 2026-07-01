@@ -25760,7 +25760,7 @@ var VideoState = {
 };
 /**
  * 電流・電圧・電力メーターの換算定数。
- * 参照: ./akadako-meter-slim.html および https://699.jp/wattmeter/
+ * 参照: https://699.jp/wattmeter/
  * アナログレベル(0〜100 [%])にこれらの係数を掛けて実量を得る。
  * @readonly
  */
