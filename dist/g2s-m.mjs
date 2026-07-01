@@ -29835,36 +29835,6 @@ var ExtensionBlocks = /*#__PURE__*/function () {
           }),
           arguments: {}
         }, '---', {
-          opcode: 'measureVoltage',
-          blockType: blockType.REPORTER,
-          disableMonitor: false,
-          text: formatMessage({
-            id: 'g2s.measureVoltage',
-            default: 'voltage (V)',
-            description: 'report measured voltage on analog A1 in volts'
-          }),
-          arguments: {}
-        }, {
-          opcode: 'measureCurrent',
-          blockType: blockType.REPORTER,
-          disableMonitor: false,
-          text: formatMessage({
-            id: 'g2s.measureCurrent',
-            default: 'current (A)',
-            description: 'report measured current on analog A2 in amperes'
-          }),
-          arguments: {}
-        }, {
-          opcode: 'measurePower',
-          blockType: blockType.REPORTER,
-          disableMonitor: false,
-          text: formatMessage({
-            id: 'g2s.measurePower',
-            default: 'power (W)',
-            description: 'report measured electric power in watts'
-          }),
-          arguments: {}
-        }, '---', {
           opcode: 'digitalLevelA1',
           blockType: blockType.REPORTER,
           disableMonitor: false,
@@ -30207,6 +30177,36 @@ var ExtensionBlocks = /*#__PURE__*/function () {
               defaultValue: VideoState.ON
             }
           }
+        }, '---', {
+          opcode: 'measureVoltage',
+          blockType: blockType.REPORTER,
+          disableMonitor: false,
+          text: formatMessage({
+            id: 'g2s.measureVoltage',
+            default: 'voltage (V)',
+            description: 'report measured voltage on analog A1 in volts'
+          }),
+          arguments: {}
+        }, {
+          opcode: 'measureCurrent',
+          blockType: blockType.REPORTER,
+          disableMonitor: false,
+          text: formatMessage({
+            id: 'g2s.measureCurrent',
+            default: 'current (A)',
+            description: 'report measured current on analog A2 in amperes'
+          }),
+          arguments: {}
+        }, {
+          opcode: 'measurePower',
+          blockType: blockType.REPORTER,
+          disableMonitor: false,
+          text: formatMessage({
+            id: 'g2s.measurePower',
+            default: 'power (W)',
+            description: 'report measured electric power in watts'
+          }),
+          arguments: {}
         }, '---', {
           opcode: 'sendIrRemote',
           text: formatMessage({
