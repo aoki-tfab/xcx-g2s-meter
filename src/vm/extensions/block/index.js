@@ -875,7 +875,8 @@ class ExtensionBlocks {
         const level = this.analogLevelA2();
         if (typeof level !== 'number') return '';
         const current = level > METER_MIN_LEVEL ? level * METER_CURRENT_COEFF : 0;
-        return Math.round(current * 100) / 100;
+        // 分解能はレベル0.1刻み×0.02=0.002Aなので小数第3位まで残す
+        return Math.round(current * 1000) / 1000;
     }
 
     /**
@@ -886,7 +887,8 @@ class ExtensionBlocks {
         const voltage = this.measureVoltage();
         const current = this.measureCurrent();
         if (typeof voltage !== 'number' || typeof current !== 'number') return '';
-        return Math.round(voltage * current * 100) / 100;
+        // 電圧×電流の積。参照HTMLと同じく小数第3位まで残す
+        return Math.round(voltage * current * 1000) / 1000;
     }
 
     /**

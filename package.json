@@ -1,6 +1,6 @@
 {
   "name": "xcx-g2s",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "scripts": {
     "build": "node scripts/build.js",
     "start": "npm run start-xcratch",
