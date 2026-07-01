@@ -26619,9 +26619,13 @@ var ExtensionBlocks = /*#__PURE__*/function () {
     value: function measurePower() {
       var voltage = this.measureVoltage();
       var current = this.measureCurrent();
-      if (typeof voltage !== 'number' || typeof current !== 'number') return ''; // 電圧×電流の積。参照HTMLと同じく小数第3位まで残す
+      if (typeof voltage !== 'number' || typeof current !== 'number') return '';
+      var power = voltage * current;
+      if (power === 0) return 0; // 電圧・電流はそれぞれ最大4桁の有効数字。単純な積は見かけの桁が増えて
+      // しまう（例 12.34 × 1.234 = 15.22756）ため、掛け算の有効数字の規則に
+      // 従い有効数字4桁にそろえる。toPrecisionで丸め、Numberで余分な0を除く。
 
-      return Math.round(voltage * current * 1000) / 1000;
+      return Number(power.toPrecision(4));
     }
     /**
      * Set the connector to power [%] as PWM.
