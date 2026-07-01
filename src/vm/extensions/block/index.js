@@ -126,6 +126,19 @@ const VideoState = {
 };
 
 /**
+ * 電流・電圧・電力メーターの換算定数。
+ * 参照: https://699.jp/wattmeter/
+ * アナログレベル(0〜100 [%])にこれらの係数を掛けて実量を得る。
+ * @readonly
+ */
+// アナログレベルがこの値以下のときは 0 とみなす（ノイズ・未接続対策）
+const METER_MIN_LEVEL = 0.1;
+// 電圧: アナログA1レベル(0〜100) × 0.2 → 0〜20V
+const METER_VOLTAGE_COEFF = 0.2;
+// 電流: アナログA2レベル(0〜100) × 0.02 → 0〜2A
+const METER_CURRENT_COEFF = 0.02;
+
+/**
  * Scratch 3.0 blocks for example of Xcratch.
  */
 class ExtensionBlocks {
@@ -839,6 +852,47 @@ class ExtensionBlocks {
         if (!this.isConnected()) return '';
         const raw = this.board.getAnalogValue(3);
         return Math.round((raw / 1023) * 1000) / 10;
+    }
+
+    /**
+     * Measured voltage [V] on the analog A1 connector. Range 0 to 20 [V].
+     * Converts the analog level (0-100 [%]) with METER_VOLTAGE_COEFF.
+     * @returns {number | string} - voltage [V] or empty string when disconnected
+     */
+    measureVoltage () {
+        const level = this.analogLevelA1();
+        if (typeof level !== 'number') return '';
+        const voltage = level > METER_MIN_LEVEL ? level * METER_VOLTAGE_COEFF : 0;
+        return Math.round(voltage * 100) / 100;
+    }
+
+    /**
+     * Measured current [A] on the analog A2 connector. Range 0 to 2 [A].
+     * Converts the analog level (0-100 [%]) with METER_CURRENT_COEFF.
+     * @returns {number | string} - current [A] or empty string when disconnected
+     */
+    measureCurrent () {
+        const level = this.analogLevelA2();
+        if (typeof level !== 'number') return '';
+        const current = level > METER_MIN_LEVEL ? level * METER_CURRENT_COEFF : 0;
+        // 分解能はレベル0.1刻み×0.02=0.002Aなので小数第3位まで残す
+        return Math.round(current * 1000) / 1000;
+    }
+
+    /**
+     * Measured electric power [W] = voltage [V] x current [A]. Range 0 to 40 [W].
+     * @returns {number | string} - power [W] or empty string when disconnected
+     */
+    measurePower () {
+        const voltage = this.measureVoltage();
+        const current = this.measureCurrent();
+        if (typeof voltage !== 'number' || typeof current !== 'number') return '';
+        const power = voltage * current;
+        if (power === 0) return 0;
+        // 電圧・電流はそれぞれ最大4桁の有効数字。単純な積は見かけの桁が増えて
+        // しまう（例 12.34 × 1.234 = 15.22756）ため、掛け算の有効数字の規則に
+        // 従い有効数字4桁にそろえる。toPrecisionで丸め、Numberで余分な0を除く。
+        return Number(power.toPrecision(4));
     }
 
     /**
@@ -3530,6 +3584,43 @@ class ExtensionBlocks {
                             menu: 'VIDEO_STATE',
                             defaultValue: VideoState.ON
                         }
+                    }
+                },
+                '---',
+                {
+                    opcode: 'measureVoltage',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: false,
+                    text: formatMessage({
+                        id: 'g2s.measureVoltage',
+                        default: 'voltage (V)',
+                        description: 'report measured voltage on analog A1 in volts'
+                    }),
+                    arguments: {
+                    }
+                },
+                {
+                    opcode: 'measureCurrent',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: false,
+                    text: formatMessage({
+                        id: 'g2s.measureCurrent',
+                        default: 'current (A)',
+                        description: 'report measured current on analog A2 in amperes'
+                    }),
+                    arguments: {
+                    }
+                },
+                {
+                    opcode: 'measurePower',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: false,
+                    text: formatMessage({
+                        id: 'g2s.measurePower',
+                        default: 'power (W)',
+                        description: 'report measured electric power in watts'
+                    }),
+                    arguments: {
                     }
                 },
                 '---',

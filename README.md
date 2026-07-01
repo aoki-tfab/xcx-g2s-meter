@@ -1,49 +1,165 @@
-# Grove2Scratch
-An example extension for [Xcratch](https://xcratch.github.io/)
+# AkaDako (xcx-g2s)
 
-This extension add extra-block "do it", that executes string in its input field as a sentence in Javascript and return the result.
+[Xcratch](https://xcratch.github.io/) 用の拡張機能です。教育用計測制御ボード **[AkaDako](https://akadako.com/)** をパソコンにつなぎ、Grove 規格のセンサーやアクチュエーターを Scratch のブロックから操作できます。
 
+「g2s」は **Grove to Scratch** の略で、AkaDako を通して Grove モジュールと Scratch をつなぐことを表しています。
 
-## ✨ What You Can Do With This Extension
+## ✨ この拡張機能でできること
 
-Play [Example Project](https://xcratch.github.io/editor/#https://tfabworks.github.io/xcx-g2s/projects/example.sb3) to look at what you can do with "Grove" extension. 
-<iframe src="https://xcratch.github.io/editor/player#https://tfabworks.github.io/xcx-g2s/projects/example.sb3" width="540px" height="460px"></iframe>
+AkaDako ボードを USB で接続すると、以下のようなことが Scratch のブロックだけで行えます。
 
+- **センサー計測**: 距離・加速度・明るさ・温度・気圧・湿度・水温 など
+- **表示**: フルカラー LED（NeoPixel）の点灯・アニメーション
+- **デジタル入出力**: デジタルの入力・出力、内蔵ボタン・人感センサーなど
+- **アナログ入出力**: アナログ入力、PWM、サーボの制御
+- **電力測定**: 電圧・電流・電力の計測（[電力測定ボード TFW-AD-PWR1](https://tfabworks.com/product/tfw-ad-pwr1/)）
+- **外部連携**: 通信グループでのデータ共有、生成 AI への質問、スプレッドシート記録、LINE・メール送信
+- **上級者向け**: I2C／OneWire 通信、数列・バイト列操作、赤外線リモコン送信
 
-## How to Use in Xcratch
+> ブラウザーは **Google Chrome** など Web MIDI / Web Serial に対応したものを使ってください。追加のアプリのインストールは不要です。
 
-This extension can be used with other extension in [Xcratch](https://xcratch.github.io/). 
-1. Open [Xcratch Editor](https://xcratch.github.io/editor)
-2. Click 'Add Extension' button
-3. Select 'Extension Loader' extension
-4. Type the module URL in the input field 
+## 🧰 準備するもの
+
+- AkaDako ボード（S-LINK など）と USB ケーブル
+- 使いたい Grove モジュール（センサー・アクチュエーターなど）
+- Google Chrome（推奨）が入ったパソコン
+
+## 🚀 Xcratch での使い方
+
+この拡張は [Xcratch](https://xcratch.github.io/) 上で、他の拡張機能と一緒に使えます。
+
+1. [Xcratch エディター](https://xcratch.github.io/editor) を開く
+2. 画面左下の **「拡張機能を追加」** ボタンをクリックする
+3. **「Extension Loader（拡張機能ローダー）」** を選ぶ
+4. 入力欄に次のモジュール URL を貼り付ける
+
+   ```
+   https://tfabworks.github.io/xcx-g2s/dist/g2s.mjs
+   ```
+
+5. ブロックパレットに **AkaDako** のブロックが追加されます。
+6. **「ボードを接続する」** ブロックで AkaDako を接続してから、各ブロックを使います。
+
+サンプルプロジェクト: [example.sb3 を Xcratch で開く](https://xcratch.github.io/editor/#https://tfabworks.github.io/xcx-g2s/projects/example.sb3)
+
+## 🧩 ブロックの説明
+
+ブロックはカテゴリーごとに整理されています。代表的なものを紹介します。
+
+### 接続
+
+| ブロック | はたらき |
+| --- | --- |
+| `ボードを接続する` / `ボードを切断する` | AkaDako への接続・切断 |
+| `ボードに接続している` | 接続状態を返す（真偽） |
+| `ボードのバージョン` / `ボードのUID` | ボード情報を返す |
+| `ボードが[接続された/切断された]とき` | 接続状態が変わったときに動くイベント |
+
+### センサー
+
+| ブロック | はたらき |
+| --- | --- |
+| `距離 レーザーI2Cの距離(cm)` / `超音波デジタルA・Bの距離(cm)` | 距離を測る |
+| `加速度I2CのX・Y・Z・絶対値(m/s^2)` `ピッチ・ロール(度)` | 加速度・傾き |
+| `加速度I2Cがゆさぶられたら` | 揺れを検知するイベント |
+| `光I2Cの明るさ(lx)` / `光アナログ(内蔵)の明るさ` | 明るさを測る |
+| `環境I2Cの温度(°C)・気圧(hPa)・湿度(%)` | 環境センサー |
+| `水温デジタルA・Bの温度(°C)` | 水温センサー |
+| `人感(内蔵)の値` | 内蔵の人感センサーで人の動きを検知する |
+
+### フルカラー LED（NeoPixel）
+
+テープ状のフルカラー LED を制御します。色や明るさを「設定」してから、`光らせる` で実際に反映します。
+
+| ブロック | はたらき |
+| --- | --- |
+| `カラーLED[コネクタ]を長さ[N]に設定する` | つないだ LED の個数（長さ）を設定する |
+| `カラーLED[コネクタ]の[N]番目を[色]色で明るさ[N]に設定する` | 指定した 1 個の色と明るさを決める |
+| `カラーLED[コネクタ]の全てを[色]色で明るさ[N]に設定する` | すべての LED の色と明るさをまとめて決める |
+| `カラーLED[コネクタ]を[N]個分設定をずらす([回転する/しない])` | 表示を N 個分ずらす（アニメーションに使う） |
+| `カラーLED RGB 赤[R] 緑[G] 青[B]` | RGB の数値から色を作る（色の指定に使う） |
+| `カラーLEDを光らせる` | 設定した内容を反映して点灯する |
+| `カラーLED[コネクタ]を消す` | 消灯する |
+
+`[色]` では、赤・緑・青などの固定色のほか、`全てを[色]色で…` のブロックでは「レインボー」も選べます。
+
+### デジタル入出力
+
+| ブロック | はたらき |
+| --- | --- |
+| `デジタルA(A1)の値` など | デジタル入力（0/1）を読む |
+| `[コネクタ]が1である` / `[コネクタ]が[0/1]になったとき` | 入力の判定・イベント |
+| `[コネクタ]を[0/1]にする` | デジタル出力 |
+| `[ピン]をプルアップする` | 入力のプルアップ設定 |
+| 内蔵: `Aボタン` `Bボタン` `人感` `制御スイッチ` | ボード内蔵の入出力 |
+
+### アナログ入出力
+
+| ブロック | はたらき |
+| --- | --- |
+| `アナログA(A1)の値` など（0〜100） | アナログ入力を読む |
+| `PWM[コネクタ]をデューティー比[％]にする` | PWM 出力（内蔵の振動モーターなど） |
+| `サーボ[コネクタ]を速度[％]で[角度]度にする` | サーボモーターの制御 |
+
+### 電力測定（電力測定ボード TFW-AD-PWR1）
+
+[AkaDako 用電力測定ボード TFW-AD-PWR1](https://tfabworks.com/product/tfw-ad-pwr1/) を使って、電圧・電流・電力を計測します。
+
+| ブロック | はたらき | 範囲 |
+| --- | --- | --- |
+| `電圧(V)` | 計測した電圧を返す | 0 〜 20 V |
+| `電流(A)` | 計測した電流を返す | 0 〜 2 A |
+| `電力(W)` | 電圧 × 電流を返す | 0 〜 40 W |
+
+**配線**: 付属の Grove ケーブルで TFW-AD-PWR1 を AkaDako の **アナログ（Analog A）Grove 端子** に接続します。ボードの **入力＋/−** に手回し発電機・電池などの電源を、**出力＋/−** に豆電球・LED・扇風機などの負荷をつなぎます。ボード内部で電圧がアナログ A1、電流がアナログ A2 に出力され、上記ブロックがその値を読み取ります。
+
+いずれも入力欄のない、値を返すだけのブロックです。ボード未接続のときは空の値を返します。
+
+### 外部連携（AkaDako Connect）
+
+| ブロック | はたらき |
+| --- | --- |
+| `ネットに接続する` / `通信[ラベル]=[値]を送る` / `通信[ラベル]の値` | 通信グループでデータを共有 |
+| `生成AIに[対象][プロンプト]と聞く` | 生成 AI に質問する |
+| `スプレッドシート URL[…]に[値]を記録` ほか | Google スプレッドシートへ記録・読み書き |
+| `LINE トークン[…]に[…]を送る` / `メール アドレス[…]に[…]を送る` | LINE・メール送信 |
+
+### 上級者向け
+
+I2C（`I2C…に書き込む/読み出す`）、OneWire、数列・バイト列の操作、int64／bit 演算、`赤外線リモコン[…]ボタン[…]を送信する` などのブロックも用意されています。
+
+## 🛠 開発
+
+### 必要環境
+
+- Node.js（LTS 推奨）
+
+### ビルド
+
+```sh
+npm install
+npm run build
 ```
-https://tfabworks.github.io/xcx-g2s/dist/g2s.mjs
-```
 
-## Development
+ビルドすると、Xcratch から読み込めるモジュール `dist/g2s.mjs` が出力されます。初回ビルド時にベースとなる [scratch-gui](https://github.com/xcratch/scratch-gui) を `../scratch-gui` に自動で取得します。
 
-### Register on the local Xcratch
-
-Run register script to install this extension on the local Xcratch for testing.
+### ローカルの Xcratch で試す
 
 ```sh
 npm run register
 ```
 
-### Bundle into a Module
+ローカルの scratch-gui にこの拡張を登録して、開発中の状態を確認できます。
 
-Run build script to bundle this extension into a module file which could be loaded on Xcratch.
+## 🏠 ホームページ
 
-```sh
-npm run build
-```
+- 拡張機能ページ: <https://tfabworks.github.io/xcx-g2s/>
+- AkaDako 製品情報: <https://akadako.com/>
 
-## 🏠 Home Page
+## 🤝 コントリビュート
 
-Open this page from [https://tfabworks.github.io/xcx-g2s/](https://tfabworks.github.io/xcx-g2s/)
+不具合の報告や機能要望を歓迎します。[Issues](https://github.com/tfabworks/xcx-g2s/issues) をご確認ください。
 
+## 📝 ライセンス
 
-## 🤝 Contributing
-
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/tfabworks/xcx-g2s/issues). 
+[MIT License](./LICENSE) で公開しています。
